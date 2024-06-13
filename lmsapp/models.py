@@ -1,39 +1,108 @@
 from django.db import models
 
 
-class Roles(models.Model):
-    role_id = models.AutoField(primary_key=True)
-    role_name = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class Address(models.Model):
+    address_id = models.AutoField(primary_key=True)
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    zip_code = models.CharField(max_length=255)
 
-    class Meta:
-        managed = False
-        db_table = 'roles'
+    def __str__(self):
+        return self.street
 
 
-class Users(models.Model):
+class Customer(models.Model):
+    customer_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    address = models.OneToOneField(Address, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class User(models.Model):
     user_id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=255, blank=True, null=True)
-    email = models.CharField(max_length=255, blank=True, null=True)
-    password = models.CharField(max_length=255, blank=True, null=True)
-    role_id = models.ForeignKey(
-        Roles, models.DO_NOTHING, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.username
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.first_name
+
+
+class Product(models.Model):
+    product_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    price = models.IntegerField()
+    stock = models.IntegerField()
+    image = models.ImageField(upload_to='images/')
+
+
+class Supplier(models.Model):
+    supplier_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class ProductSupplier(models.Model):
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     class Meta:
-        managed = False
-        db_table = 'users'
+        indexes = [
+            models.Index(fields=['supplier', 'product'])
+        ]
+
+    def __str__(self):
+        return self.product.name
 
 
-class Student(models.Model):
-    student_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(
-        Users, models.DO_NOTHING, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class Orders(models.Model):
+    order_id = models.AutoField(primary_key=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    date = models.DateField()
 
-    class Meta:
-        managed = False
-        db_table = 'student'
+    def __str__(self):
+        return self.product.name
+
+
+class Shipment(models.Model):
+    shipment_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    date = models.DateField()
+
+    def __str__(self):
+        return self.order.product.name
+
+
+class StockAdjustment(models.Model):
+    stock_adjustment_id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    date = models.DateField()
+
+    def __str__(self):
+        return self.product.name
