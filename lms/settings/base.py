@@ -20,6 +20,13 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+CSRF_FAILUER_VIEW = 'myapp.views.my_csrf_failure_view'
+
+CSRF_TRUSTED_SECURE = True
+
+CSRF_TRUSTED_ORIGINS = ['https://jmmssx-8000.csb.app']
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -177,4 +184,5 @@ WAGTAILADMIN_BASE_URL = "http://example.com"
 # This can be omitted to allow all files, but note that this may present a security risk
 # if untrusted users are allowed to upload files -
 # see https://docs.wagtail.org/en/stable/advanced_topics/deploying.html#user-uploaded-files
-WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
+WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key',
+                          'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
